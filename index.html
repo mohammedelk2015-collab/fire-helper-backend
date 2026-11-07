@@ -1,186 +1,558 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SlideMind AI</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SLIDEMIND AI</title>
+
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#0c1020;color:#f5f6ff;font-family:Arial,sans-serif;height:100vh;display:flex;flex-direction:column}
-header{height:65px;background:#151b30;border-bottom:1px solid #29314d;display:flex;align-items:center;padding:0 22px;gap:12px}
-.logo{font-size:22px;font-weight:bold;color:#ff754b}
-.logo span{color:white}
-#status{font-size:12px;color:#aab3ce;margin-left:auto}
-main{flex:1;display:flex;flex-direction:column;max-width:900px;width:100%;margin:auto;padding:20px;min-height:0}
-#messages{flex:1;overflow-y:auto;padding:10px 0}
-.welcome{text-align:center;margin:12vh auto 30px;max-width:550px}
-.welcome h1{font-size:38px;margin-bottom:10px}
-.welcome p{color:#aab3ce;line-height:1.6}
-.message{padding:14px 17px;border-radius:15px;margin:12px 0;max-width:85%;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}
-.user{background:#26365d;margin-left:auto}
-.ai{background:#19233b;border:1px solid #303c5c}
-#composer{display:flex;gap:10px;background:#171e32;border:1px solid #34405f;border-radius:17px;padding:10px}
-textarea{flex:1;resize:none;min-height:48px;max-height:140px;background:transparent;border:0;outline:0;color:white;font:16px Arial;padding:13px}
-button{border:0;border-radius:12px;padding:12px 18px;background:#ff7043;color:white;font-weight:bold;cursor:pointer}
-button:disabled{opacity:.45;cursor:not-allowed}
-.actions{display:flex;justify-content:space-between;align-items:center;margin:12px 2px;color:#8f9bb9;font-size:12px}
-#progress{height:5px;background:#252e48;border-radius:10px;overflow:hidden;margin:8px 0}
-#bar{height:100%;width:0;background:#ff7043;transition:width .2s}
-#notice{color:#aab3ce;font-size:12px;text-align:center;line-height:1.5;margin:10px}
-@media(max-width:600px){main{padding:12px}.welcome h1{font-size:30px}.message{max-width:95%}header{padding:0 13px}}
+:root{
+ --bg:#06131a;
+ --panel:#0b2029;
+ --panel2:#102a34;
+ --line:#17434c;
+ --cyan:#20e6dc;
+ --blue:#39b9d2;
+ --muted:#7898a2;
+ --white:#e6fbff;
+}
+body{
+ margin:0;
+ background:var(--bg);
+ color:var(--white);
+ font-family:Arial,sans-serif;
+ min-height:100vh;
+}
+button{font:inherit;cursor:pointer}
+.app{display:flex;min-height:100vh}
+.sidebar{
+ width:225px;
+ background:#081a22;
+ border-right:1px solid var(--line);
+ padding:22px 14px;
+ display:flex;
+ flex-direction:column;
+ flex-shrink:0;
+}
+.brand{
+ display:flex;
+ align-items:center;
+ gap:10px;
+ padding:4px 8px 27px;
+ font-size:19px;
+ font-weight:bold;
+ letter-spacing:1px;
+ color:var(--cyan);
+}
+.logo{
+ width:31px;height:31px;
+ border:2px solid var(--cyan);
+ border-radius:50%;
+ display:grid;place-items:center;
+ box-shadow:0 0 13px #20e6dc55;
+}
+.nav-label{
+ color:#527781;
+ font-size:10px;
+ letter-spacing:1.5px;
+ margin:16px 9px 9px;
+}
+.nav{
+ display:flex;
+ align-items:center;
+ gap:12px;
+ padding:12px 11px;
+ margin:3px 0;
+ color:#9ab5bd;
+ border-radius:7px;
+ font-size:13px;
+ cursor:pointer;
+}
+.nav:hover,.nav.active{
+ background:#10333b;
+ color:var(--cyan);
+}
+.nav.active{border-left:2px solid var(--cyan)}
+.sidebar-bottom{
+ margin-top:auto;
+ border-top:1px solid var(--line);
+ padding-top:15px;
+}
+.profile{
+ background:#102a34;
+ border:1px solid var(--line);
+ border-radius:9px;
+ padding:12px;
+ font-size:12px;
+}
+.profile small{color:var(--muted)}
+.main{flex:1;min-width:0;padding:22px 28px}
+.topbar{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ border-bottom:1px solid var(--line);
+ padding:0 0 17px;
+}
+.top-title{font-size:13px;color:#9bb9c0}
+.top-right{display:flex;gap:12px;align-items:center}
+.online{
+ color:var(--cyan);
+ font-size:11px;
+ border:1px solid #17605d;
+ background:#0b292b;
+ padding:7px 11px;
+ border-radius:20px;
+}
+.avatar{
+ width:31px;height:31px;border-radius:50%;
+ background:#16424a;
+ display:grid;place-items:center;color:var(--cyan);
+}
+.heading{margin:27px 0 18px}
+.heading h1{font-size:25px;margin:0 0 7px}
+.heading p{color:var(--muted);font-size:13px;margin:0}
+.dashboard{
+ display:grid;
+ grid-template-columns:repeat(3,minmax(0,1fr));
+ gap:13px;
+}
+.card{
+ background:linear-gradient(145deg,#102832,#0b1e27);
+ border:1px solid var(--line);
+ border-radius:11px;
+ padding:16px;
+ min-width:0;
+}
+.card-label{color:#8baeb7;font-size:11px}
+.card-value{font-size:21px;margin:13px 0 5px;color:var(--cyan)}
+.card-note{font-size:10px;color:#688d98}
+.workspace{
+ display:grid;
+ grid-template-columns:minmax(0,1fr) 245px;
+ gap:15px;
+ margin-top:17px;
+}
+.chat-panel{
+ background:#0b2029;
+ border:1px solid var(--line);
+ border-radius:12px;
+ overflow:hidden;
+ min-width:0;
+}
+.panel-head{
+ padding:15px 17px;
+ border-bottom:1px solid var(--line);
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+}
+.panel-head h2{font-size:13px;margin:0}
+.panel-head small{color:var(--cyan);font-size:10px}
+#chat{
+ height:330px;
+ overflow-y:auto;
+ padding:17px;
+ background:radial-gradient(ellipse at top,#10313a 0%,#091b23 70%);
+}
+.welcome{
+ text-align:center;
+ padding:38px 15px;
+ color:#b9d6dc;
+}
+.welcome-icon{
+ width:50px;height:50px;
+ display:grid;place-items:center;
+ margin:0 auto 15px;
+ border:1px solid #23717a;
+ border-radius:15px;
+ color:var(--cyan);
+ font-size:25px;
+ box-shadow:0 0 22px #20e6dc22;
+}
+.welcome h3{margin:0 0 8px;font-size:17px}
+.welcome p{font-size:12px;color:#82a5ae;line-height:1.6}
+.message{
+ padding:12px 14px;
+ margin:12px 0;
+ border-radius:9px;
+ max-width:90%;
+ font-size:13px;
+ line-height:1.6;
+ white-space:pre-wrap;
+ overflow-wrap:anywhere;
+}
+.user{
+ margin-left:auto;
+ background:#123d49;
+ border:1px solid #1c6470;
+}
+.ai{
+ margin-right:auto;
+ background:#102b34;
+ border:1px solid #1b4650;
+}
+.composer{
+ padding:13px;
+ border-top:1px solid var(--line);
+ background:#0b2029;
+}
+textarea{
+ display:block;
+ width:100%;
+ height:75px;
+ resize:vertical;
+ background:#07171e;
+ border:1px solid #1c4852;
+ color:white;
+ border-radius:8px;
+ padding:12px;
+ outline:none;
+ font:13px Arial;
+}
+textarea:focus{border-color:var(--cyan)}
+.composer-bottom{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ margin-top:10px;
+ gap:10px;
+}
+.hint{font-size:10px;color:#668b95}
+.actions{display:flex;gap:8px}
+.btn{
+ border:1px solid #21616a;
+ color:#b9dce0;
+ background:#102b34;
+ border-radius:7px;
+ padding:9px 13px;
+ font-size:11px;
+}
+.btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.send{
+ background:#13bdb5;
+ color:#04191c;
+ border:0;
+ font-weight:bold;
+ padding:10px 18px;
+ border-radius:7px;
+ font-size:12px;
+ box-shadow:0 0 13px #20e6dc33;
+}
+.send:hover{background:#51f2e9}
+.send:disabled{opacity:.5;cursor:not-allowed}
+.right-column{display:flex;flex-direction:column;gap:13px}
+.side-card{
+ background:#0c222b;
+ border:1px solid var(--line);
+ border-radius:10px;
+ padding:15px;
+}
+.side-card h3{font-size:12px;margin:0 0 14px}
+.quick{
+ padding:11px 9px;
+ border:1px solid #173b45;
+ border-radius:7px;
+ margin:8px 0;
+ font-size:11px;
+ color:#a8c8ce;
+ cursor:pointer;
+}
+.quick:hover{border-color:var(--cyan);color:var(--cyan)}
+.status{font-size:11px;color:#e6c96d;margin-top:12px;overflow-wrap:anywhere}
+.feature{
+ display:flex;gap:10px;align-items:center;
+ padding:9px 0;
+ border-bottom:1px solid #17343c;
+ font-size:11px;color:#a4c0c7;
+}
+.feature:last-child{border:0}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+.footer{color:#557b85;font-size:10px;margin-top:20px;text-align:center}
+@media(max-width:850px){
+ .sidebar{width:175px}
+ .workspace{grid-template-columns:1fr}
+ .right-column{display:grid;grid-template-columns:1fr 1fr}
+}
+@media(max-width:600px){
+ .sidebar{width:58px;padding:15px 7px}
+ .brand{padding:5px 4px 25px}
+ .brand-name,.nav span,.nav-label,.profile{display:none}
+ .nav{justify-content:center;padding:13px 5px}
+ .main{padding:15px 12px}
+ .dashboard{grid-template-columns:1fr}
+ .right-column{display:flex}
+ .top-title{font-size:11px}
+ #chat{height:350px}
+}
 </style>
 </head>
+
 <body>
-<header>
-  <div class="logo">🔥 Slide<span>Mind</span></div>
-  <div id="status">AI not loaded</div>
-</header>
+<div class="app">
 
-<main>
-  <section id="messages">
+<aside class="sidebar">
+ <div class="brand">
+  <div class="logo">S</div>
+  <span class="brand-name">SLIDEMIND</span>
+ </div>
+
+ <div class="nav-label">WORKSPACE</div>
+ <div class="nav active">◈ <span>Dashboard</span></div>
+ <div class="nav" onclick="focusChat()">✧ <span>AI Assistant</span></div>
+ <div class="nav" onclick="clearChat()">▤ <span>New Conversation</span></div>
+
+ <div class="nav-label">TOOLS</div>
+ <div class="nav" onclick="focusChat()">▧ <span>AI Generator</span></div>
+ <div class="nav" onclick="focusChat()">⌕ <span>Research Tools</span></div>
+ <div class="nav" onclick="focusChat()">◉ <span>My Projects</span></div>
+
+ <div class="nav-label">PREFERENCES</div>
+ <div class="nav">⚙ <span>Settings</span></div>
+
+ <div class="sidebar-bottom">
+  <div class="profile">
+   <div style="color:var(--cyan);margin-bottom:5px">● SlideMind User</div>
+   <small>AI Workspace</small>
+  </div>
+ </div>
+</aside>
+
+<main class="main">
+ <div class="topbar">
+  <div class="top-title">WORKSPACE / DASHBOARD</div>
+  <div class="top-right">
+   <div class="online">● AI WORKSPACE</div>
+   <div class="avatar">S</div>
+  </div>
+ </div>
+
+ <div class="heading">
+  <h1>Welcome to SLIDEMIND</h1>
+  <p>Your intelligent workspace. What would you like to create today?</p>
+ </div>
+
+ <section class="dashboard">
+  <div class="card">
+   <div class="card-label">AI ASSISTANT</div>
+   <div class="card-value">✧ Ready</div>
+   <div class="card-note">Ask questions and get answers</div>
+  </div>
+  <div class="card">
+   <div class="card-label">WORKSPACE</div>
+   <div class="card-value">Active</div>
+   <div class="card-note">Your personal AI workspace</div>
+  </div>
+  <div class="card">
+   <div class="card-label">CONNECTION</div>
+   <div class="card-value" id="connectionCard">Waiting</div>
+   <div class="card-note">Online AI service</div>
+  </div>
+ </section>
+
+ <section class="workspace">
+  <div class="chat-panel" id="assistant">
+   <div class="panel-head">
+    <h2>✧ AI CONVERSATION</h2>
+    <small>SLIDEMIND ASSISTANT</small>
+   </div>
+
+   <div id="chat">
     <div class="welcome" id="welcome">
-      <h1>What can I help with?</h1>
-      <p>Welcome to SlideMind. Your AI runs directly in your browser. The first model download can take a while.</p>
+     <div class="welcome-icon">✧</div>
+     <h3>Welcome to SLIDEMIND</h3>
+     <p>Your AI assistant is ready to help.<br>
+     Write a message below to start a conversation.</p>
     </div>
-  </section>
+   </div>
 
-  <div id="progress"><div id="bar"></div></div>
-  <div id="notice">Waiting to load the AI model. A WebGPU-compatible browser is required.</div>
-
-  <div id="composer">
-    <textarea id="prompt" placeholder="Message SlideMind..." rows="1"></textarea>
-    <button id="send" disabled>Send</button>
+   <div class="composer">
+    <textarea id="question" placeholder="Ask SlideMind anything..."></textarea>
+    <div class="composer-bottom">
+     <div class="hint">ENTER TO SEND · SHIFT + ENTER FOR NEW LINE</div>
+     <div class="actions">
+      <button class="btn" onclick="clearChat()">CLEAR CHAT</button>
+      <button class="send" id="sendButton" onclick="sendMessage()">SEND ↗</button>
+     </div>
+    </div>
+   </div>
   </div>
 
-  <div class="actions">
-    <span>SlideMind · Browser AI</span>
-    <button id="clear" style="background:#293550;padding:8px 12px">New chat</button>
-  </div>
+  <aside class="right-column">
+   <div class="side-card">
+    <h3>✧ QUICK PROMPTS</h3>
+    <div class="quick" onclick="usePrompt('Explain artificial intelligence in simple words.')">Explain something to me</div>
+    <div class="quick" onclick="usePrompt('Help me create a website using HTML.')">Create an HTML website</div>
+    <div class="quick" onclick="usePrompt('Give me ideas for a new project.')">Find project ideas</div>
+    <div class="quick" onclick="usePrompt('Help me write a presentation.')">Write a presentation</div>
+   </div>
+
+   <div class="side-card">
+    <h3>◈ WORKSPACE STATUS</h3>
+    <div class="feature"><span class="dot"></span> Chat interface ready</div>
+    <div class="feature"><span class="dot"></span> Message history active</div>
+    <div class="feature"><span class="dot"></span> AI connection available</div>
+    <div class="status" id="status">Waiting for API key...</div>
+   </div>
+
+   <div class="side-card">
+    <h3>ABOUT SLIDEMIND</h3>
+    <div style="font-size:11px;color:#85a8b1;line-height:1.7">
+     Your personal AI workspace for questions, ideas, research and creativity.
+    </div>
+   </div>
+  </aside>
+ </section>
+
+ <div class="footer">SLIDEMIND AI · YOUR INTELLIGENT WORKSPACE</div>
 </main>
+</div>
 
-<script type="module">
-const MODEL = "Qwen2.5-0.5B-Instruct-q4f16_1-MLC";
+<script>
+/* ==================================================
+   🔥 YOUR API KEY GOES HERE
 
-const messagesBox = document.getElementById("messages");
-const promptBox = document.getElementById("prompt");
-const sendButton = document.getElementById("send");
-const statusBox = document.getElementById("status");
-const notice = document.getElementById("notice");
-const bar = document.getElementById("bar");
+   Replace the text inside the quotation marks
+   with your own OpenRouter API key.
 
-let engine = null;
-let busy = false;
+   WARNING: Never publish a real key in public HTML.
+   Anyone can view the source and copy it.
+================================================== */
 
-let history = [
-  {
-    role: "system",
-    content: "You are SlideMind, a helpful, friendly AI assistant. Give clear, useful answers."
-  }
-];
+const API_KEY = "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";
 
-function addMessage(text, type) {
-  document.getElementById("welcome")?.remove();
-  const el = document.createElement("div");
-  el.className = "message " + type;
-  el.textContent = text;
-  messagesBox.appendChild(el);
-  messagesBox.scrollTop = messagesBox.scrollHeight;
-  return el;
+/* AI SETTINGS */
+const API_URL = "https://openrouter.ai/api/v1/chat/completions";
+const MODEL = "openrouter/free";
+
+/* APP SETTINGS */
+const chat = document.getElementById("chat");
+const questionBox = document.getElementById("question");
+const sendButton = document.getElementById("sendButton");
+const statusText = document.getElementById("status");
+const connectionCard = document.getElementById("connectionCard");
+
+let conversation = [];
+
+function setStatus(message,color="#e6c96d"){
+ statusText.textContent=message;
+ statusText.style.color=color;
 }
 
-async function loadAI() {
-  try {
-    if (!("gpu" in navigator)) {
-      throw new Error("WebGPU is unavailable. Try a compatible, up-to-date browser.");
-    }
+function addMessage(text,type){
+ const welcome=document.getElementById("welcome");
+ if(welcome) welcome.remove();
 
-    statusBox.textContent = "Loading AI library...";
-    notice.textContent = "Connecting to the browser AI engine...";
-
-    const webllm = await import("https://esm.run/@mlc-ai/web-llm");
-
-    statusBox.textContent = "Downloading AI model...";
-    notice.textContent = "Downloading the AI model. This may take several minutes the first time.";
-
-    engine = await webllm.CreateMLCEngine(MODEL, {
-      initProgressCallback: (report) => {
-        const percent = Math.round((report.progress || 0) * 100);
-        bar.style.width = percent + "%";
-        notice.textContent = report.text || "Preparing AI model...";
-      }
-    });
-
-    statusBox.textContent = "AI ready";
-    notice.textContent = "SlideMind is ready. Your messages are processed in this browser.";
-    sendButton.disabled = false;
-    promptBox.focus();
-
-  } catch (error) {
-    console.error(error);
-    statusBox.textContent = "AI unavailable";
-    notice.textContent = "Could not start the AI: " + error.message;
-  }
+ const item=document.createElement("div");
+ item.className="message "+type;
+ item.textContent=text;
+ chat.appendChild(item);
+ chat.scrollTop=chat.scrollHeight;
 }
 
-async function sendMessage() {
-  const text = promptBox.value.trim();
-  if (!text || busy || !engine) return;
-
-  busy = true;
-  sendButton.disabled = true;
-  promptBox.value = "";
-
-  addMessage(text, "user");
-  history.push({ role: "user", content: text });
-
-  const answer = addMessage("Thinking...", "ai");
-
-  try {
-    const response = await engine.chat.completions.create({
-      messages: history,
-      temperature: 0.7,
-      max_tokens: 700
-    });
-
-    const reply =
-      response.choices?.[0]?.message?.content || "I couldn't generate a reply.";
-
-    answer.textContent = reply;
-    history.push({ role: "assistant", content: reply });
-
-  } catch (error) {
-    answer.textContent = "AI error: " + error.message;
-    history.pop();
-  }
-
-  busy = false;
-  sendButton.disabled = false;
-  promptBox.focus();
-  messagesBox.scrollTop = messagesBox.scrollHeight;
+function focusChat(){
+ questionBox.focus();
+ document.getElementById("assistant").scrollIntoView({behavior:"smooth"});
 }
 
-sendButton.addEventListener("click", sendMessage);
+function usePrompt(text){
+ questionBox.value=text;
+ focusChat();
+}
 
-promptBox.addEventListener("keydown", event => {
-  if (event.key === "Enter" && !event.shiftKey) {
-    event.preventDefault();
-    sendMessage();
+function clearChat(){
+ conversation=[];
+ chat.innerHTML=`
+ <div class="welcome" id="welcome">
+  <div class="welcome-icon">✧</div>
+  <h3>Welcome to SLIDEMIND</h3>
+  <p>Your AI assistant is ready to help.<br>
+  Write a message below to start a conversation.</p>
+ </div>`;
+ setStatus("New conversation started.","#20e6dc");
+}
+
+async function sendMessage(){
+ const question=questionBox.value.trim();
+
+ if(!question){
+  setStatus("Write a message first.");
+  return;
+ }
+
+ if(!API_KEY || API_KEY==="PASTE_YOUR_OPENROUTER_API_KEY_HERE"){
+  setStatus("Add your API key in the marked place in the HTML.","#ff7777");
+  return;
+ }
+
+ addMessage(question,"user");
+ questionBox.value="";
+
+ conversation.push({role:"user",content:question});
+ sendButton.disabled=true;
+ sendButton.textContent="THINKING...";
+ setStatus("SlideMind is thinking...","#20e6dc");
+
+ try{
+  const response=await fetch(API_URL,{
+   method:"POST",
+   headers:{
+    "Authorization":"Bearer "+API_KEY,
+    "Content-Type":"application/json",
+    "HTTP-Referer":location.href,
+    "X-OpenRouter-Title":"SlideMind AI"
+   },
+   body:JSON.stringify({
+    model:MODEL,
+    messages:[
+     {
+      role:"system",
+      content:"You are SlideMind AI, a helpful assistant. Give clear, friendly, useful answers."
+     },
+     ...conversation
+    ]
+   })
+  });
+
+  const data=await response.json().catch(()=>({}));
+
+  if(!response.ok){
+   throw new Error(data.error?.message || "HTTP "+response.status);
   }
+
+  const answer=data.choices?.[0]?.message?.content;
+  if(!answer) throw new Error("The AI returned an empty response.");
+
+  conversation.push({role:"assistant",content:answer});
+  addMessage(answer,"ai");
+  setStatus("● AI connected and ready","#20e6dc");
+  connectionCard.textContent="Online";
+
+ }catch(error){
+  addMessage("Sorry, I couldn't get a response.\n"+error.message,"ai");
+  setStatus("Connection failed: "+error.message,"#ff7777");
+  connectionCard.textContent="Offline";
+ }finally{
+  sendButton.disabled=false;
+  sendButton.textContent="SEND ↗";
+  questionBox.focus();
+ }
+}
+
+questionBox.addEventListener("keydown",event=>{
+ if(event.key==="Enter" && !event.shiftKey){
+  event.preventDefault();
+  sendMessage();
+ }
 });
 
-document.getElementById("clear").addEventListener("click", () => {
-  history = [{
-    role: "system",
-    content: "You are SlideMind, a helpful, friendly AI assistant. Give clear, useful answers."
-  }];
-  messagesBox.innerHTML = `
-    <div class="welcome" id="welcome">
-      <h1>What can I help with?</h1>
-      <p>Welcome back to SlideMind. What would you like to ask?</p>
-    </div>`;
-});
-
-loadAI();
+if(API_KEY==="PASTE_YOUR_OPENROUTER_API_KEY_HERE"){
+ setStatus("Add your API key in the HTML source.");
+}else{
+ setStatus("API key found. Ready to connect.","#20e6dc");
+}
 </script>
 </body>
 </html>
